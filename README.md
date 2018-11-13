@@ -33,6 +33,7 @@ The Movies can be filtered using a slider component from the Material UI lab.
 ```sh
 git clone https://github.com/xoryco/moviechallenge.git
 cd moviechallenge
+npm install
 npm start
 ```
 
