@@ -1,6 +1,46 @@
+This is a work in Progress Code Challenge
+
+At this Point in time there are some challenges outstanding which are listed below.
+
+
+## What works right now 
+
+The App loads data from the TMDB Current Movie and Genre APIs.
+
+The Movies are displayed with the rating, title and movie poster.
+
+The Movies are sorted by rating after loading
+
+The Movies can be filtered using a slider component from the Material UI lab. 
+
+
+
+## Next Steps
+
+- Get distinct movie ids from the movie genre array so genre checkboxes only of the results set are shown
+- Map through the genre array and genre ids and send the genre names to the Movie Component 
+- Display the genres as chips in the Movie Card 
+- Add selected checkboxes to a genrefilter array 
+- Combine the genrefilter array with rating filter 
+- Set up tests in Jest 
+- Refactor code so that state is used less
+
+
+
+
+## Quick Install from GitHub
+
+```sh
+git clone https://github.com/xoryco/moviechallenge.git
+cd moviechallenge
+npm start
+```
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## To Run this Project on your own machine
 
 In the project directory, you can run:
 
@@ -17,15 +57,9 @@ You will also see any lint errors in the console.
 Launches the test runner in the interactive watch mode.<br>
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
+Currently no JEST/Enzyme tests have been set up but this is to do.
+
 ### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 ### `npm run eject`
 
