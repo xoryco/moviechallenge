@@ -8,26 +8,10 @@ import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 
 //declare function component with props of title poster path and vote average
-// NEED TO ADD GENRES
+
 class Movie extends Component {
   
-
-  
   render() {
-    //Destructure required data from props
-    //const { title, poster_path, vote_average, genre_ids } = this.props.movie;
-    //this.state.genreNames.map((name, i) => {
-      //let { genreNames } =  this.state;
-    
-      //console.log(this.state.genreNames);
-    /*const testi = this.state.genreNames;
-
-     testi.map((name, i) => {
-      console.log(name + i);
-     });
-      */
-
-      //console.log(this.props.genrelist); 
     const genreList = this.props.genrelist;
     const movieIds = this.props.genre_ids;
     let movieGenreNames = [];
@@ -42,9 +26,7 @@ class Movie extends Component {
       }
       
     }
-    console.log("movieGenreNames");
-    console.log(movieGenreNames);
-    //this.setState({genreNames: movieGenreNames});
+   
     this.genreNames = movieGenreNames;
     
     return(
@@ -64,7 +46,7 @@ class Movie extends Component {
               />
               {/* Title of the Movie */}
               <CardContent>         
-                <Typography gutterBottom variant="headline" component="h3">
+                <Typography gutterBottom variant="h5" component="h3">
                   {this.props.title}
                 </Typography>
                 {/* Circular Avatar for Rating */}
@@ -83,8 +65,5 @@ class Movie extends Component {
                 
   }
 }
-/*const Movie = ({ title, poster_path, vote_average, genre_ids }, genrelist) => (
-  
-);*/
 
 export default Movie;

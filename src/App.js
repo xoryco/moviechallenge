@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { API_URL, API_KEY } from "./config";
-import Movie from "./components/Movie";
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import theme from './theme';
 import Slider from "@material-ui/lab/Slider";
 import "./App.css";
 import Grid from "@material-ui/core/Grid";
@@ -9,6 +10,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Movie from "./components/Movie";
 import logo from "./hotflix.svg";
 
 class App extends Component {
@@ -19,11 +21,10 @@ class App extends Component {
     rating: 3, //Selected Rating with default of 3
     genreId: [], //Selected Genres Filter Ids
     genreList: [], //Genres from TMDB
-    imageUrl: "//image.tmdb.org/t/p/"
+    imageUrl: "//image.tmdb.org/t/p/" //Set baseline imageUrl as current working base
   };
 
   /* componentDidMount LIFECYCLE METHOD */
-
   componentDidMount() {
     //Generate URL string literal from API details in config using an ES6 template literal
     const imageSettingsUrl = `${API_URL}configuration?api_key=${API_KEY}`;
@@ -71,6 +72,7 @@ class App extends Component {
       })
       .catch(error => console.error("Movie API Error:", error));
   };
+
   /* Sort Order of Movie Results by the popularity property of the movie */
   sortResults = () => {
     let mylist = this.state.allMovies;
@@ -78,8 +80,6 @@ class App extends Component {
       return b.popularity - a.popularity;
     });
     this.setState({ allMovies: mylist });
-    //SET THE CURRENTLY SELECTED MOVIE FOR INITIAL STATE PROB DELETE THIS
-    this.setState({ movies: mylist });
     // Call the filter Method to only show active genres
     this.filterGenres();
   };
@@ -93,12 +93,8 @@ class App extends Component {
     const allIds = [].concat(...allGenreIds);
     //array of unique ids by using Set and converting it to an array
     const uniqueIds = [...new Set(allIds)];
-
-    console.log("UNIQUE GENRES" + uniqueIds);
-    console.log(uniqueIds);
     //Copy the Loaded Genres
     let unfilteredGenres = this.state.genreList;
-    console.log(this.state.genreList);
 
     let filteredGenres = unfilteredGenres.filter(genre => {
       for (let unique of uniqueIds) {
@@ -106,10 +102,7 @@ class App extends Component {
       }
     });
     this.setState({ genreList: filteredGenres });
-
-    //let name = this.lookupGenreNames([18, 35]);
-    //console.log("new array lets see what comes back");
-    //console.log(name);
+    this.filterResults(this.state.rating, this.state.genreId);
   };
 
   /* Handle Slider Changes */
@@ -132,27 +125,21 @@ class App extends Component {
     } else {
       selectedIds.push(checkboxId);
     }
-
+    //Set the state of the selected genre ids
     this.setState({
       genreId: selectedIds
     });
-    console.log(this.state.genreId);
+    //Call our results method with current values of rating and selected genres
     this.filterResults(this.state.rating, this.state.genreId);
   };
 
   filterResults = (rating = 3, ids = []) => {
-    console.log("The Selected Rating For the search is " + rating);
-    console.log("The Selected ID" + ids);
-    console.log(ids);
-
+    
     const allMovies = this.state.allMovies;
 
-    //let movieresults = new Array;
     let movieresults = [];
-    //let genreFilter = [18, 10402];
+
     let genreFilter = ids;
-    console.log("genreFilter");
-    console.log(genreFilter);
     //Get Length of the GenreFilter
     const filterCount = genreFilter.length;
     //For each movie in all of the movies
@@ -162,16 +149,13 @@ class App extends Component {
         //if no genres are selected add the results to our array
         if (filterCount === 0) {
           movieresults.push(movie);
-        } else {
+        } //otherwise match all selected genres to those in the movie, checking for length to ensure all match
+        else {
           let matchedGenres = 0;
           for (let genre of genreFilter) {
-            console.log(genre);
             if (movie.genre_ids.includes(genre)) {
               matchedGenres++;
-            } /*
-            else{
-              movieresults.push(movie);
-            }*/
+            } 
           }
           if (matchedGenres === filterCount) {
             movieresults.push(movie);
@@ -179,31 +163,18 @@ class App extends Component {
         }
       }
     }
-    console.log(movieresults);
+    //Set the state of the Moviesresults of our filtered set of movies
+    //This will be displayed by the movie component
     this.setState({
       movies: movieresults
     });
   };
 
-  /* Look up Genre Names by Table */
-  /* Maybe add new property to the AllMovies property */
-  /*lookupGenreNames = (ids = []) => {
-    console.log(ids);
-    let GenreNames = [];
-    let GenreTable = this.state.genreList;
-    for (let num of ids) {
-      if (parseInt(num) === GenreTable.id) {
-        GenreNames.push(GenreTable.name);
-      }
-    }
-    console.log(GenreNames);
-    return GenreNames;
-  };*/
-
   /* RENDER LIFE CYCLEMETHOD */
   render() {
     const { movies, genreList } = this.state;
     return (
+      <MuiThemeProvider theme={theme}>
       <div className="App">
         <AppBar position="fixed" style={{ background: "#000000" }}>
           <Toolbar>
@@ -212,7 +183,7 @@ class App extends Component {
               style={{ width: "15%", padding: "1%" }}
               alt="Hotflix Logo"
             />
-            <Typography variant="title" color="inherit">
+            <Typography variant="h4" color="inherit">
               What's showing Now!
             </Typography>
           </Toolbar>
@@ -254,7 +225,7 @@ class App extends Component {
                     control={
                       <Checkbox
                         onChange={this.handleCheckBox}
-                        value={genre.id}
+                        value={`${genre.id}`}
                         key={genre.id}
                         style={{ color: "white" }}
                       />
@@ -274,8 +245,13 @@ class App extends Component {
             </div>
             {/* if there are movies that meet the search criteria display each using the movie component */}
             {this.state.movies.length > 0 ? (
-              movies.map((movie, i)=> (
-                <Movie {...movie} genrelist={this.state.genreList} baseUrl={this.state.imageUrl} key={i}/>
+              movies.map((movie, i) => (
+                <Movie
+                  {...movie}
+                  genrelist={this.state.genreList}
+                  baseUrl={this.state.imageUrl}
+                  key={i}
+                />
               ))
             ) : (
               <div>
@@ -287,6 +263,7 @@ class App extends Component {
           </Grid>
         </Grid>
       </div>
+      </MuiThemeProvider>
     );
   }
 }
