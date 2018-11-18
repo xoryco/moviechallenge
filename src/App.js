@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { API_URL, API_KEY } from "./config";
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
-import theme from './theme';
+import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
+import theme from "./theme";
 import Slider from "@material-ui/lab/Slider";
 import "./App.css";
 import Grid from "@material-ui/core/Grid";
@@ -30,6 +30,7 @@ class App extends Component {
     const imageSettingsUrl = `${API_URL}configuration?api_key=${API_KEY}`;
     const genresUrl = `${API_URL}genre/movie/list?api_key=${API_KEY}`;
     const movieUrl = `${API_URL}movie/popular?api_key=${API_KEY}`;
+    this.setState({ loading: true });
     this.getImageSettings(imageSettingsUrl);
     this.getGenres(genresUrl);
     this.getMovies(movieUrl);
@@ -98,7 +99,9 @@ class App extends Component {
 
     let filteredGenres = unfilteredGenres.filter(genre => {
       for (let unique of uniqueIds) {
-        if (genre.id === unique) return genre.id;
+        if (genre.id === unique) {
+        return genre.id;
+        }
       }
     });
     this.setState({ genreList: filteredGenres });
@@ -134,7 +137,6 @@ class App extends Component {
   };
 
   filterResults = (rating = 3, ids = []) => {
-    
     const allMovies = this.state.allMovies;
 
     let movieresults = [];
@@ -155,7 +157,7 @@ class App extends Component {
           for (let genre of genreFilter) {
             if (movie.genre_ids.includes(genre)) {
               matchedGenres++;
-            } 
+            }
           }
           if (matchedGenres === filterCount) {
             movieresults.push(movie);
@@ -175,94 +177,105 @@ class App extends Component {
     const { movies, genreList } = this.state;
     return (
       <MuiThemeProvider theme={theme}>
-      <div className="App">
-        <AppBar position="fixed" style={{ background: "#000000" }}>
-          <Toolbar>
-            <img
-              src={logo}
-              style={{ width: "15%", padding: "1%" }}
-              alt="Hotflix Logo"
-            />
-            <Typography variant="h4" color="inherit">
-              What's showing Now!
-            </Typography>
-          </Toolbar>
-        </AppBar>
+        <div className="App">
+          <AppBar position="fixed" style={{ background: "#000000" }}>
+            <Toolbar>
+              <img
+                src={logo}
+                style={{ width: "15%", padding: "1%" }}
+                alt="Hotflix Logo"
+              />
+              <Typography variant="h4" color="inherit">
+                What's showing Now!
+              </Typography>
+            </Toolbar>
+          </AppBar>
 
-        <Grid container spacing={24} style={{ padding: 24 }}>
-          <Grid
-            container
-            spacing={24}
-            style={{ background: "rgba(255,255,255,0.1)", marginTop: "6%" }}
-          >
-            <Grid item xs={12} sm={4}>
-              <h2>
-                Movie Rating better than <br /> (<em>{this.state.rating}</em>{" "}
-                out of 10)
-              </h2>
-
-              <div>
-                {/* Input slider for ratings */}
-                <Slider
-                  style={{
-                    width: "50%",
-                    margin: "auto"
-                  }}
-                  value={this.state.rating}
-                  min={0}
-                  max={10}
-                  step={0.5}
-                  onChange={this.handleOnChange.bind(this)}
-                />
-              </div>
-            </Grid>
-            <Grid item xs={12} sm={8}>
-              <h2>Select Only Films of a Certain Genre(s)</h2>
-              <form>
-                {/* Checkboxes for genres */}
-                {genreList.map((genre, i) => (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        onChange={this.handleCheckBox}
-                        value={`${genre.id}`}
-                        key={genre.id}
-                        style={{ color: "white" }}
-                      />
-                    }
-                    style={{ color: "white" }}
-                    className={"white"}
-                    key={genre.id}
-                    label={genre.name}
-                  />
-                ))}
-              </form>
-            </Grid>
-          </Grid>
-          <Grid container spacing={24}>
-            <div>
-              <hr />
-            </div>
-            {/* if there are movies that meet the search criteria display each using the movie component */}
-            {this.state.movies.length > 0 ? (
-              movies.map((movie, i) => (
-                <Movie
-                  {...movie}
-                  genrelist={this.state.genreList}
-                  baseUrl={this.state.imageUrl}
-                  key={i}
-                />
-              ))
-            ) : (
-              <div>
-                <Typography variant="h2" color="inherit">
-                  No currently showing movies match your criteria
+          <Grid container spacing={24} style={{ padding: 24 }}>
+            <Grid
+              container
+              spacing={24}
+              style={{ background: "rgba(255,255,255,0.1)", marginTop: "6%" }}
+            >
+              <Grid item xs={12} sm={4}>
+                <Typography variant="h4" gutterBottom={true}>
+                  Movie Rating better than <br /> (<em>{this.state.rating}</em>{" "}
+                  out of 10)
                 </Typography>
+
+                <div>
+                  {/* Input slider for ratings */}
+                  <Slider
+                    style={{
+                      width: "50%",
+                      margin: "auto"
+                    }}
+                    value={this.state.rating}
+                    min={0}
+                    max={10}
+                    step={0.5}
+                    color="secondary"
+                    onChange={this.handleOnChange.bind(this)}
+                  />
+                </div>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Typography variant="h4" gutterBottom={true}>
+                  Select Only Films of a Certain Genre(s)
+                </Typography>
+                <form>
+                  {/* Checkboxes for genres */}
+                  {genreList.map((genre, i) => (
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          onChange={this.handleCheckBox}
+                          value={`${genre.id}`}
+                          key={genre.id}
+                          style={{ color: "white" }}
+                        />
+                      }
+                      style={{ color: "white" }}
+                      color={"secondary"}
+                      key={genre.id}
+                      label={genre.name}
+                    />
+                  ))}
+                </form>
+              </Grid>
+            </Grid>
+            <Grid container spacing={24}>
+              <div>
+                <hr />
               </div>
-            )}
+              {/* if there are movies that meet the search criteria display each using the movie component */}
+              {this.state.movies.length > 0 ? (
+                movies.map((movie, i) => (
+                  <Movie
+                    {...movie}
+                    genrelist={this.state.genreList}
+                    baseUrl={this.state.imageUrl}
+                    key={i}
+                  />
+                ))
+              ) : (
+                <div>
+                  <Typography
+                    variant="h2"
+                    color="secondary"
+                    style={{
+                      color: "#FFFFFF",
+                      paddingTop: "2em",
+                      textAlign: "center"
+                    }}
+                  >
+                    No currently showing movies match your criteria
+                  </Typography>
+                </div>
+              )}
+            </Grid>
           </Grid>
-        </Grid>
-      </div>
+        </div>
       </MuiThemeProvider>
     );
   }

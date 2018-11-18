@@ -4,9 +4,7 @@ import pink from 'material-ui/colors/pink';
 import red from 'material-ui/colors/red';*/
 
 export default createMuiTheme({
-  typography: {
-    useNextVariants: true
-  },
+  
   palette: {
     common: { black: "#000", white: "rgba(255, 255, 255, 1)" },
     background: { paper: "rgba(255, 255, 255, 1)", default: "#fafafa" },
@@ -29,10 +27,27 @@ export default createMuiTheme({
       contrastText: "#fff"
     },
     text: {
-      primary: "rgba(0, 0, 0, 0.87)",
+      primary: "rgba(255, 255, 255, 0.87)",
       secondary: "rgba(0, 0, 0, 0.54)",
       disabled: "rgba(0, 0, 0, 0.38)",
       hint: "rgba(0, 0, 0, 0.38)"
     }
+  },
+  typography: {
+    title: {
+        color: 'black'
+    }, 
+    useNextVariants: true
+  },
+  title: {
+    color: "red",
+    fontSize: 25
+  },
+  overrides: {
+    MuiSlider: {
+      track: { backgroundColor: 'red' },
+      thumb: { backgroundColor: 'red' },
+    },
+    CardHeader: {color: "black"}
   }
 });
