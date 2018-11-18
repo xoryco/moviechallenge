@@ -11,7 +11,9 @@ body {
   height: 40vmin;
 }
 
-input {
+.white{color: white;}
+
+input, label {
   color: white;
 }
 

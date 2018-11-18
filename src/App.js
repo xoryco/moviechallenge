@@ -7,28 +7,55 @@ import Grid from "@material-ui/core/Grid";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import logo from "./hotflix.svg";
 
 class App extends Component {
   state = {
-    allMovies: [],
-    movies: [],
-    loading: false,
-    rating: 3,
-    genreId: [],
-    genreList: [{}]
+    allMovies: [], //All the movies loaded from TMDB
+    movies: [], //Filtered Movie Result Set
+    loading: false, //Flag while loading data
+    rating: 3, //Selected Rating with default of 3
+    genreId: [], //Selected Genres Filter Ids
+    genreList: [], //Genres from TMDB
+    imageUrl: "//image.tmdb.org/t/p/"
   };
+
+  /* componentDidMount LIFECYCLE METHOD */
 
   componentDidMount() {
     //Generate URL string literal from API details in config using an ES6 template literal
-    const movieUrl = `${API_URL}movie/popular?api_key=${API_KEY}`;
+    const imageSettingsUrl = `${API_URL}configuration?api_key=${API_KEY}`;
     const genresUrl = `${API_URL}genre/movie/list?api_key=${API_KEY}`;
-    this.getMovies(movieUrl);
+    const movieUrl = `${API_URL}movie/popular?api_key=${API_KEY}`;
+    this.getImageSettings(imageSettingsUrl);
     this.getGenres(genresUrl);
+    this.getMovies(movieUrl);
   }
 
-  //Retrieve Current Movies from the Genre API of TMDB
-  getMovies = movieUrl => {  
+  //Retrieve Genres from the Genre API of TMDB
+  getImageSettings = imageSettingsUrl => {
+    fetch(imageSettingsUrl)
+      .then(result => result.json())
+      .then(result => {
+        this.setState({ imageUrl: result.images.secure_base_url });
+      })
+      .catch(error => console.error("Image API Error:", error));
+  };
+
+  //Retrieve Genres from the Genre API of TMDB
+  getGenres = genresUrl => {
+    fetch(genresUrl)
+      .then(result => result.json())
+      .then(result => {
+        this.setState({ genreList: [...result.genres] });
+      })
+      .catch(error => console.error("Genre API Error:", error));
+  };
+
+  //Retrieve Current Movies from the Movie API of TMDB
+  getMovies = movieUrl => {
     fetch(movieUrl)
       .then(result => result.json())
       .then(result => {
@@ -42,67 +69,114 @@ class App extends Component {
           }
         );
       })
-      .catch(error => console.error("Error:", error));
+      .catch(error => console.error("Movie API Error:", error));
+  };
+  /* Sort Order of Movie Results by the popularity property of the movie */
+  sortResults = () => {
+    let mylist = this.state.allMovies;
+    mylist.sort((a, b) => {
+      return b.popularity - a.popularity;
+    });
+    this.setState({ allMovies: mylist });
+    //SET THE CURRENTLY SELECTED MOVIE FOR INITIAL STATE PROB DELETE THIS
+    this.setState({ movies: mylist });
+    // Call the filter Method to only show active genres
+    this.filterGenres();
   };
 
-  //Retrieve Genres from the Genre API of TMDB
-  getGenres = genresUrl => {
-    fetch(genresUrl)
-      .then(result => result.json())
-      .then(result => {
-        this.setState({ genreList: [...result.genres] });
-      })
-      .catch(error => console.error("Error:", error));
+  //Get Distinct genre values from all retrieved Movies
+  filterGenres = () => {
+    const totalMovies = this.state.allMovies;
+    //get all genre ids from the results set
+    const allGenreIds = totalMovies.map(movie => movie.genre_ids);
+    // flatten the array of genre ids and merge together
+    const allIds = [].concat(...allGenreIds);
+    //array of unique ids by using Set and converting it to an array
+    const uniqueIds = [...new Set(allIds)];
+
+    console.log("UNIQUE GENRES" + uniqueIds);
+    console.log(uniqueIds);
+    //Copy the Loaded Genres
+    let unfilteredGenres = this.state.genreList;
+    console.log(this.state.genreList);
+
+    let filteredGenres = unfilteredGenres.filter(genre => {
+      for (let unique of uniqueIds) {
+        if (genre.id === unique) return genre.id;
+      }
+    });
+    this.setState({ genreList: filteredGenres });
+
+    //let name = this.lookupGenreNames([18, 35]);
+    //console.log("new array lets see what comes back");
+    //console.log(name);
   };
 
-  /* Handle Checkbox Changes */
+  /* Handle Slider Changes */
   handleOnChange = (event, value) => {
     const newValue = parseFloat(value);
     this.setState({
       rating: newValue
     });
-    this.filterResults(newValue, [13, 22, 19, 24]);
+    this.filterResults(newValue, this.state.genreId);
   };
 
   /* Handle Checkbox Changes */
   handleCheckBox = event => {
-    console.log(event.target.value);
-    this.filterResults(this.state.rating, event.target.value);
-  };
+    let checkboxId = parseInt(event.target.value);
+    let selectedIds = this.state.genreId;
 
-  /* Sort Order of Movie Results */
-  sortResults = () => {
-    let mylist = this.state.allMovies;
-    mylist.sort((a, b) => {
-      return b.vote_average - a.vote_average;
+    if (selectedIds.includes(checkboxId)) {
+      const existingIndex = selectedIds.findIndex(ids => ids === checkboxId);
+      selectedIds.splice(existingIndex, 1);
+    } else {
+      selectedIds.push(checkboxId);
+    }
+
+    this.setState({
+      genreId: selectedIds
     });
-    this.setState({ allMovies: mylist });
-
-    //SET THE CURRENTLY SELECTED MOVIE FOR INITIAL STATE PROB DELETE THIS 
-    this.setState({ movies: mylist });
-
-    //GET DISTINCT values of the genres
-    let dismovies = this.state.allMovies;
-
-    let arr2 = [...new Array(dismovies.map(movies => movies.genre_ids))];
-    console.log("UNIQUE GENRES BEFORE SET" + arr2);
-    let uniqueItems = [...new Set(arr2)];
-    console.log("UNIQUE GENRES" + uniqueItems);
+    console.log(this.state.genreId);
+    this.filterResults(this.state.rating, this.state.genreId);
   };
 
-  filterResults = (rating = 3, ids) => {
+  filterResults = (rating = 3, ids = []) => {
     console.log("The Selected Rating For the search is " + rating);
     console.log("The Selected ID" + ids);
+    console.log(ids);
 
     const allMovies = this.state.allMovies;
 
     //let movieresults = new Array;
     let movieresults = [];
-
+    //let genreFilter = [18, 10402];
+    let genreFilter = ids;
+    console.log("genreFilter");
+    console.log(genreFilter);
+    //Get Length of the GenreFilter
+    const filterCount = genreFilter.length;
+    //For each movie in all of the movies
     for (let movie of allMovies) {
-      if (movie.vote_average > rating) {
-        //console.log(movie.title)
-        movieresults.push(movie);
+      //check if the movie rating is greater or equal to the inputted rating
+      if (movie.vote_average >= rating) {
+        //if no genres are selected add the results to our array
+        if (filterCount === 0) {
+          movieresults.push(movie);
+        } else {
+          let matchedGenres = 0;
+          for (let genre of genreFilter) {
+            console.log(genre);
+            if (movie.genre_ids.includes(genre)) {
+              matchedGenres++;
+            } /*
+            else{
+              movieresults.push(movie);
+            }*/
+          }
+          if (matchedGenres === filterCount) {
+            movieresults.push(movie);
+          }
+        }
       }
     }
     console.log(movieresults);
@@ -111,14 +185,27 @@ class App extends Component {
     });
   };
 
+  /* Look up Genre Names by Table */
+  /* Maybe add new property to the AllMovies property */
+  /*lookupGenreNames = (ids = []) => {
+    console.log(ids);
+    let GenreNames = [];
+    let GenreTable = this.state.genreList;
+    for (let num of ids) {
+      if (parseInt(num) === GenreTable.id) {
+        GenreNames.push(GenreTable.name);
+      }
+    }
+    console.log(GenreNames);
+    return GenreNames;
+  };*/
+
+  /* RENDER LIFE CYCLEMETHOD */
   render() {
     const { movies, genreList } = this.state;
     return (
       <div className="App">
-        <AppBar
-          position="fixed"
-          style={{ background: "#000000" }}
-        >
+        <AppBar position="fixed" style={{ background: "#000000" }}>
           <Toolbar>
             <img
               src={logo}
@@ -132,11 +219,15 @@ class App extends Component {
         </AppBar>
 
         <Grid container spacing={24} style={{ padding: 24 }}>
-          <Grid container spacing={24} style={{background:"rgba(255,255,255,0.1)", marginTop: "6%" }}>
-            <Grid item xs>
+          <Grid
+            container
+            spacing={24}
+            style={{ background: "rgba(255,255,255,0.1)", marginTop: "6%" }}
+          >
+            <Grid item xs={12} sm={4}>
               <h2>
-                Movie Rating better than (<em>{this.state.rating}</em> out of
-                10)
+                Movie Rating better than <br /> (<em>{this.state.rating}</em>{" "}
+                out of 10)
               </h2>
 
               <div>
@@ -154,20 +245,25 @@ class App extends Component {
                 />
               </div>
             </Grid>
-            <Grid item xs>
-              <h2>All Genres [not working yet]</h2>
+            <Grid item xs={12} sm={8}>
+              <h2>Select Only Films of a Certain Genre(s)</h2>
               <form>
                 {/* Checkboxes for genres */}
                 {genreList.map((genre, i) => (
-                  <label>
-                    <input
-                      type="Checkbox"
-                      value={genre.id}
-                      onChange={this.handleCheckBox}
-                      key={genre.id}
-                    />
-                    {genre.name}
-                  </label>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        onChange={this.handleCheckBox}
+                        value={genre.id}
+                        key={genre.id}
+                        style={{ color: "white" }}
+                      />
+                    }
+                    style={{ color: "white" }}
+                    className={"white"}
+                    key={genre.id}
+                    label={genre.name}
+                  />
                 ))}
               </form>
             </Grid>
@@ -176,10 +272,18 @@ class App extends Component {
             <div>
               <hr />
             </div>
-            {/* if there are movies that meet the search criteria display each using the movie functional component */}
-            {this.state.movies
-              ? movies.map(movie => <Movie {...movie} />)
-              : "No Movies found that match your criteria"}
+            {/* if there are movies that meet the search criteria display each using the movie component */}
+            {this.state.movies.length > 0 ? (
+              movies.map((movie, i)=> (
+                <Movie {...movie} genrelist={this.state.genreList} baseUrl={this.state.imageUrl} key={i}/>
+              ))
+            ) : (
+              <div>
+                <Typography variant="h2" color="inherit">
+                  No currently showing movies match your criteria
+                </Typography>
+              </div>
+            )}
           </Grid>
         </Grid>
       </div>

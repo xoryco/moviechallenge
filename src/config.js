@@ -1,5 +1,5 @@
 // TMDB URL strings - no https included for flexibiility
-const API_URL = '//api.themoviedb.org/3/';
+const API_URL = 'https://api.themoviedb.org/3/';
 const MOVIE_POSTER_URL ='//image.tmdb.org/t/p/';
 
 // TMDB API settings
