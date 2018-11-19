@@ -50,17 +50,19 @@ class Movie extends Component {
             
                   <Avatar
                     style={{
-                      margin: "5",
                       color: "#fff",
                       backgroundColor: "black",
                       fontWeight: "bolder",
-                      fontVariant: "italic",
-                      top: '-100px'
+                      fontStyle: "italic",
+                      fontSize: 'x-large',
+                      top: "-35px",
+                      left: "10px",
+                      padding: "5px"
                     }}
                   >
                     {this.props.vote_average}
                   </Avatar>
-                  <Typography variant="h5" gutterBottom={true} style={{color:'#333', fontWeight: '300'}}>
+                  <Typography variant="h5" gutterBottom={true} style={{color:"#333", fontWeight: "300"}}>
                   {this.props.title}
                 </Typography>
 

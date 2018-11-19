@@ -1,32 +1,16 @@
-This is a work in Progress Code Challenge
+This is a Code Challenge for a TMDB Movie Listings Page that is written in React.
 
-At this Point in time there are some challenges outstanding which are listed below.
+The project shows the now showing movies in the cinema from TMDB and allows users to filter by multiple genres and by rating
 
+The project uses some Material UI components for displaying the results
 
-## What works right now 
+![screenshot of the project](screenshots/screenshot.png "This is what it should look like")
 
-The App loads data from the TMDB Current Movie and Genre APIs.
+## Requirements to run this Project
 
-The Movies are displayed with the rating, title and movie poster.
+- A modern web browser like [Chrome](https://www.google.com/chrome/b/)
 
-The Movies are sorted by rating after loading
-
-The Movies can be filtered using a slider component from the Material UI lab. 
-
-
-
-## Next Steps
-
-- Get distinct movie ids from the movie genre array so genre checkboxes only of the results set are shown
-- Map through the genre array and genre ids and send the genre names to the Movie Component 
-- Display the genres as chips in the Movie Card 
-- Add selected checkboxes to a genrefilter array 
-- Combine the genrefilter array with rating filter 
-- Set up tests in Jest 
-- Refactor code so that state is used less
-
-
-
+- An up to date version of [NodeJs](https://nodejs.org/en/download/) installed on your computer
 
 ## Quick Install from GitHub
 
@@ -36,10 +20,29 @@ cd moviechallenge
 npm install
 npm start
 ```
+The project should be visible on your browser at [http://localhost:3000](http://localhost:3000)
 
+## How this Project Works 
 
+The primary entrypoint of this React Project is App.js
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+When the App component loads, data is loaded into state from the TMDB Web APIs of Image Config, Current Movies, and Genres.
+
+The full results of Movie are sorted by popularity.
+
+An array of Movie Genres IDs are taken from the Movie results set and filtered for distinct values.
+
+The Movie ID Genre Lists are compared to the Genre API results set and only genres within the movie results are kept. These values are used to create a series of Checkboxes so we can filter Movie results.
+
+A Slider is used for selecting a desired Rating of between 0-10. When the slider is changed or a checkbox checked/unchecked a results method is run to generate an array of results. When genres are selected all of the selected genres have to be in the movie for that movie to be shown.
+
+The Results array is displayed using the Movie.js Component.
+
+The Movie component receives the Movie API data, image config and Genre name mapping as props.
+
+The Movie component displays the Rating, Poster image, Title and Genres for the Movies in the results set using a vertical card format. 
+
+Hope you like it!
 
 ## To Run this Project on your own machine
 
@@ -58,21 +61,20 @@ You will also see any lint errors in the console.
 Launches the test runner in the interactive watch mode.<br>
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-Currently no JEST/Enzyme tests have been set up but this is to do.
+Currently no JEST/Enzyme tests have been set up.
 
 ### `npm run build`
 
-### `npm run eject`
+You could build this but my lawyers are probably not as good as Netflix's 
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Suggested Improvements / Next Steps
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- Set up tests in Jest 
+- Refactor code so that Movie.js is a pure functional component
 
 ## Learn More
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 

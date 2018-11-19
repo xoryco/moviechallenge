@@ -191,7 +191,7 @@ class App extends Component {
             </Toolbar>
           </AppBar>
 
-          <Grid container spacing={24} style={{ padding: 24 }}>
+          <Grid container spacing={24} style={{ padding: '24px', paddingTop: '50px' }}>
             <Grid
               container
               spacing={24}
